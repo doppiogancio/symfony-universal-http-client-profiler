@@ -3,6 +3,7 @@
 namespace HttpProfiler\Session;
 
 use DateTimeImmutable;
+use JsonException;
 use HttpProfiler\Model\TraceEntry;
 use RuntimeException;
 
@@ -12,6 +13,8 @@ use RuntimeException;
 class SessionManager
 {
     private ?string $sessionId = null;
+
+    private ?string $storageDirectory = null;
 
     private ?string $context = null;
 
@@ -23,6 +26,11 @@ class SessionManager
      * @var array<int, TraceEntry>
      */
     private array $entries = [];
+
+    public function __construct(?string $storageDirectory = null)
+    {
+        $this->storageDirectory = $storageDirectory;
+    }
 
     public function startSession(string $context, ?string $commandName = null): void
     {
@@ -51,20 +59,32 @@ class SessionManager
             'entries' => array_map($this->serializeEntry(...), $this->entries),
         ];
 
-        $directory = dirname(__DIR__, 1) . '/../var/http-profiler';
-        if (!is_dir($directory)) {
-            mkdir($directory, 0777, true);
+        $directory = $this->resolveStorageDirectory();
+
+        if (!is_dir($directory) && !mkdir($directory, 0777, true) && !is_dir($directory)) {
+            throw new RuntimeException(sprintf('Unable to create session directory at "%s".', $directory));
         }
 
         $path = sprintf('%s/session-%s.json', $directory, $this->sessionId);
 
-        file_put_contents($path, json_encode($sessionData, JSON_PRETTY_PRINT));
+        try {
+            $payload = json_encode(
+                $sessionData,
+                JSON_PRETTY_PRINT | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR,
+            );
+        } catch (JsonException $exception) {
+            $this->resetSession();
 
-        $this->sessionId = null;
-        $this->context = null;
-        $this->command = null;
-        $this->startedAt = null;
-        $this->entries = [];
+            throw new RuntimeException('Unable to encode profiling session as JSON.', 0, $exception);
+        }
+
+        if (file_put_contents($path, $payload) === false) {
+            $this->resetSession();
+
+            throw new RuntimeException(sprintf('Unable to write profiling session to "%s".', $path));
+        }
+
+        $this->resetSession();
     }
 
     public function isActive(): bool
@@ -88,6 +108,27 @@ class SessionManager
         }
 
         $this->entries[] = $entry;
+    }
+
+    private function resolveStorageDirectory(): string
+    {
+        $baseDirectory = $this->storageDirectory;
+
+        if ($baseDirectory === null) {
+            $workingDirectory = getcwd();
+            $baseDirectory = ($workingDirectory !== false ? $workingDirectory : dirname(__DIR__, 2)) . '/var/http-profiler';
+        }
+
+        return rtrim($baseDirectory, '/');
+    }
+
+    private function resetSession(): void
+    {
+        $this->sessionId = null;
+        $this->context = null;
+        $this->command = null;
+        $this->startedAt = null;
+        $this->entries = [];
     }
 
     private function serializeEntry(TraceEntry $entry): array
