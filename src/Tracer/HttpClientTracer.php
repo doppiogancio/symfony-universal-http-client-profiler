@@ -1,11 +1,143 @@
 <?php
 
-namespace UniversalHttpClientProfilerBundle\Tracer;
+namespace HttpProfiler\Tracer;
+
+use DateTimeImmutable;
+use HttpProfiler\Model\TraceEntry;
+use HttpProfiler\Storage\TraceStorage;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
- * Collects HTTP client interactions for profiling.
+ * Decorates the Symfony HTTP client to capture detailed trace information.
  */
-class HttpClientTracer
+class HttpClientTracer implements HttpClientInterface
 {
-    // TODO: hook into HTTP clients to record trace information.
+    public function __construct(
+        private readonly HttpClientInterface $inner,
+        private readonly TraceStorage $storage
+    ) {
+    }
+
+    public function request(string $method, string $url, array $options = []): ResponseInterface
+    {
+        $timestamp = new DateTimeImmutable();
+        $start = microtime(true);
+
+        $requestHeaders = $this->normalizeHeaders($options['headers'] ?? []);
+        $requestBody = $this->normalizeBody($options);
+        $responseStatus = null;
+        $responseHeaders = [];
+        $responseBody = null;
+        $error = null;
+        $stackTrace = $this->captureStackTrace();
+
+        try {
+            $response = $this->inner->request($method, $url, $options);
+
+            $responseStatus = $response->getStatusCode();
+            $responseHeaders = $response->getHeaders(false);
+            $responseBody = $response->getContent(false);
+        } catch (\Throwable $exception) {
+            $error = $exception->getMessage();
+            $stackTrace = $this->captureExceptionTrace($exception);
+            throw $exception;
+        } finally {
+            $durationMs = (microtime(true) - $start) * 1000;
+
+            $this->storage->add(new TraceEntry(
+                $timestamp,
+                $method,
+                $url,
+                $requestHeaders,
+                $requestBody,
+                $responseStatus,
+                $responseHeaders,
+                $responseBody,
+                $durationMs,
+                $error,
+                $stackTrace
+            ));
+        }
+
+        return $response;
+    }
+
+    public function stream(ResponseInterface|iterable $responses, float $timeout = null): iterable
+    {
+        return $this->inner->stream($responses, $timeout);
+    }
+
+    /**
+     * @param array<string, mixed>|iterable<string> $headers
+     * @return array<string, array<int, string>>
+     */
+    private function normalizeHeaders(array|iterable $headers): array
+    {
+        $normalized = [];
+
+        foreach ($headers as $name => $value) {
+            $normalized[(string) $name] = is_array($value) ? array_map('strval', $value) : [(string) $value];
+        }
+
+        return $normalized;
+    }
+
+    private function normalizeBody(array $options): ?string
+    {
+        if (array_key_exists('body', $options)) {
+            return $this->stringify($options['body']);
+        }
+
+        if (array_key_exists('json', $options)) {
+            return json_encode($options['json']);
+        }
+
+        if (array_key_exists('query', $options)) {
+            return http_build_query($options['query']);
+        }
+
+        return null;
+    }
+
+    private function stringify(mixed $value): ?string
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if (is_scalar($value)) {
+            return (string) $value;
+        }
+
+        if (is_array($value)) {
+            return json_encode($value);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function captureStackTrace(): array
+    {
+        return array_map(
+            static fn (array $trace): string => sprintf(
+                '%s:%s%s',
+                $trace['file'] ?? '[internal]',
+                $trace['line'] ?? '0',
+                isset($trace['function']) ? sprintf(' %s', $trace['function']) : ''
+            ),
+            debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)
+        );
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function captureExceptionTrace(\Throwable $throwable): array
+    {
+        return explode("\n", $throwable->getTraceAsString());
+    }
 }
