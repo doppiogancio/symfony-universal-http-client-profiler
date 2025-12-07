@@ -14,7 +14,11 @@ class UniversalHttpClientProfilerExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container): void
     {
-        // TODO: process configuration and register services.
+        $configuration = new Configuration();
+        $config = $this->processConfiguration($configuration, $configs);
+
+        $container->setParameter('universal_http_client_profiler.max_body_length', $config['max_body_length']);
+
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.php');
     }
