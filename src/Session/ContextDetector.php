@@ -1,6 +1,6 @@
 <?php
 
-namespace HttpProfiler\Session;
+namespace Universal\HttpClientProfiler\Session;
 
 /**
  * Detects the execution context to adjust how profiling sessions are handled.

@@ -1,13 +1,17 @@
 # Universal HTTP Client Profiler Bundle
 
-A Symfony bundle that profiles all outgoing HTTP requests in any execution context: Web requests, CLI commands, Messenger workers, cron jobs, and background processes. It integrates with the Symfony Web Profiler and adds a dedicated panel to inspect every HTTP call with method, URL, status code, duration, headers, body (truncated), errors, and full stack trace.
+A ready-to-use Symfony bundle that profiles outgoing HTTP requests and exposes them in the Web Profiler. It decorates the default `http_client`, records request/response details, and stores CLI session traces for later inspection.
 
-The bundle automatically decorates Symfony HttpClient and optionally integrates with Guzzle via middleware. When running under CLI, each process produces a profiling session saved as a JSON file, which can later be viewed inside a dedicated "CLI Sessions" panel in the Web Profiler.
+## Installation
 
-Configuration is optional. You can enable or disable profiling, mask sensitive headers, limit stored body length, enable stack trace collection, and persist or skip CLI sessions. By default it works out-of-the-box with reasonable settings.
+```bash
+composer require universal/http-client-profiler-bundle
+```
 
-Main features: outgoing HTTP request capture, unified Web + CLI profiling, Symfony Web Profiler panel, request detail view, timeline, stack trace, CLI session archive, Guzzle compatibility, masking and truncation rules, extensible architecture.
+## Usage
 
-Ideal for debugging API integrations, monitoring long-running workers, understanding performance bottlenecks, and auditing external services usage.
+1. Enable the bundle in your Symfony application as you would with any third-party bundle.
+2. Browse any page while making HTTP requests (or run CLI commands); the "HTTP Client" panel will appear in the Web Profiler with the captured traces.
+3. CLI sessions are stored under `var/http-profiler` and are listed in the collector UI.
 
-MIT license.
+The bundle works out of the box with sensible defaults—no additional configuration or optional integrations are required.

@@ -1,8 +1,8 @@
 <?php
 
-namespace HttpProfiler\Storage;
+namespace Universal\HttpClientProfiler\Storage;
 
-use HttpProfiler\Model\TraceEntry;
+use Universal\HttpClientProfiler\Model\TraceEntry;
 
 /**
  * Handles in-memory storage of HTTP trace entries.

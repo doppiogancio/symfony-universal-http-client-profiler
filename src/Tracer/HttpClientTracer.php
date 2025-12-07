@@ -1,10 +1,10 @@
 <?php
 
-namespace HttpProfiler\Tracer;
+namespace Universal\HttpClientProfiler\Tracer;
 
 use DateTimeImmutable;
-use HttpProfiler\Model\TraceEntry;
-use HttpProfiler\Storage\TraceStorage;
+use Universal\HttpClientProfiler\Model\TraceEntry;
+use Universal\HttpClientProfiler\Storage\TraceStorage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 

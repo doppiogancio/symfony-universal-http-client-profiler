@@ -1,6 +1,6 @@
 <?php
 
-namespace UniversalHttpClientProfilerBundle;
+namespace Universal\HttpClientProfiler;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
