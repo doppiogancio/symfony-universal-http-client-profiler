@@ -17,9 +17,21 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
+                ->booleanNode('enabled')
+                    ->defaultTrue()
+                ->end()
                 ->integerNode('max_body_length')
                     ->defaultValue(10240)
                     ->min(0)
+                ->end()
+                ->booleanNode('mask_sensitive_data')
+                    ->defaultTrue()
+                ->end()
+                ->booleanNode('collect_stack_trace')
+                    ->defaultFalse()
+                ->end()
+                ->booleanNode('persist_cli_sessions')
+                    ->defaultFalse()
                 ->end()
             ->end();
 
