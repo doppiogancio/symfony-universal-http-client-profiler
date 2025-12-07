@@ -1,6 +1,7 @@
 <?php
 
 use HttpProfiler\Session\ContextDetector;
+use HttpProfiler\Session\ConsoleSubscriber;
 use HttpProfiler\Session\SessionManager;
 use HttpProfiler\Storage\TraceStorage;
 use HttpProfiler\Tracer\HttpClientTracer;
@@ -26,6 +27,9 @@ return static function (ContainerConfigurator $container): void {
         ]);
 
     $services->set(SessionManager::class);
+
+    $services->set(ConsoleSubscriber::class)
+        ->tag('kernel.event_subscriber');
 
     $services->set(ContextDetector::class);
 
