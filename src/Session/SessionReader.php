@@ -87,8 +87,8 @@ class SessionReader
         $baseDirectory = $this->storageDirectory;
 
         if ($baseDirectory === null) {
-            $workingDirectory = getcwd();
-            $baseDirectory = ($workingDirectory !== false ? $workingDirectory : dirname(__DIR__, 2)) . '/var/http-profiler';
+            $projectRoot = dirname(__DIR__, 2);
+            $baseDirectory = $projectRoot . '/var/http-profiler';
         }
 
         return rtrim($baseDirectory, '/');
