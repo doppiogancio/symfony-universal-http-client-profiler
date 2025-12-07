@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 /**
  * Loads and manages bundle service configuration.
  */
-class HttpProfilerExtension extends Extension
+class UniversalHttpClientProfilerExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container): void
     {
