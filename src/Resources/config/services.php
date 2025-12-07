@@ -30,5 +30,8 @@ return static function (ContainerConfigurator $container): void {
     $services->set(ContextDetector::class);
 
     $services->set(HttpUniversalCollector::class)
-        ->tag('data_collector');
+        ->tag('data_collector', [
+            'id' => 'http_universal_profiler',
+            'template' => '@UniversalHttpClientProfiler/collector.html.twig',
+        ]);
 };

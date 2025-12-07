@@ -1,0 +1,59 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set requestCount = collector.data|length %}
+    {% set icon %}
+        {{ include('@WebProfiler/Icon/http-client.svg') }}
+        <span class="sf-toolbar-value">{{ requestCount }}</span>
+    {% endset %}
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>HTTP Client</b>
+            <span class="sf-toolbar-status">{{ requestCount }}</span>
+        </div>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true, status: requestCount > 0 ? '' : 'disabled' }) }}
+{% endblock %}
+
+{% block menu %}
+    <span class="label {{ collector.data is empty ? 'disabled' : '' }}">
+        <span class="icon">{{ include('@WebProfiler/Icon/http-client.svg') }}</span>
+        <strong>HTTP Client</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>HTTP Client Requests</h2>
+
+    {% if collector.data is empty %}
+        <div class="empty">
+            <p>No HTTP requests were recorded.</p>
+        </div>
+    {% else %}
+        <table class="alt">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Time</th>
+                    <th>Method</th>
+                    <th>URL</th>
+                    <th>Status</th>
+                    <th>Duration (ms)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in collector.data %}
+                    <tr>
+                        <td class="font-normal text-small">{{ loop.index }}</td>
+                        <td class="font-normal">{{ entry.timestamp|date('H:i:s') }}</td>
+                        <td class="font-normal">{{ entry.method }}</td>
+                        <td class="font-normal break-long-words">{{ entry.url }}</td>
+                        <td class="font-normal">{{ entry.responseStatus is null ? 'N/A' : entry.responseStatus }}</td>
+                        <td class="font-normal">{{ entry.durationMs is null ? 'N/A' : entry.durationMs|number_format(2) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
