@@ -22,10 +22,10 @@ class HttpUniversalCollector extends DataCollector
 
     public function collect(Request $request, Response $response, \Throwable $exception = null): void
     {
-        $this->data = [
-            'requests' => $this->storage->all(),
-            'cliSessions' => $this->sessionReader->listSessions(),
-        ];
+        $this->data = $this->getDefaultData();
+
+        $this->data['requests'] = $this->storage->all();
+        $this->data['cliSessions'] = $this->sessionReader->listSessions();
     }
 
     public function getName(): string
@@ -36,10 +36,8 @@ class HttpUniversalCollector extends DataCollector
     public function reset(): void
     {
         $this->storage->clear();
-        $this->data = [
-            'requests' => [],
-            'cliSessions' => [],
-        ];
+
+        $this->data = $this->getDefaultData();
     }
 
     /**
@@ -56,5 +54,13 @@ class HttpUniversalCollector extends DataCollector
     public function getCliSessions(): array
     {
         return $this->data['cliSessions'] ?? [];
+    }
+
+    private function getDefaultData(): array
+    {
+        return [
+            'requests' => [],
+            'cliSessions' => [],
+        ];
     }
 }
