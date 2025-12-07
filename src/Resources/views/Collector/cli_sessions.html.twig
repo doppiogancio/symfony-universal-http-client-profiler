@@ -17,9 +17,10 @@
         </thead>
         <tbody>
             {% for session in cliSessions %}
-                {% set requestCount = session.entries|length %}
+                {% set entries = session.entries|default([]) %}
+                {% set requestCount = entries|length %}
                 {% set totalDuration = 0 %}
-                {% for entry in session.entries %}
+                {% for entry in entries %}
                     {% if entry.duration_ms is not null %}
                         {% set totalDuration = totalDuration + entry.duration_ms %}
                     {% endif %}
@@ -41,7 +42,7 @@
                             href="#"
                             class="cli-session-link"
                             data-session-id="{{ session.session_id }}"
-                            data-session-loader="json"
+                            data-session-loader="{{ session.loader|default('json') }}"
                         >
                             View details
                         </a>
