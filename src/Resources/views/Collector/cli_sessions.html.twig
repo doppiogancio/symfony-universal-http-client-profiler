@@ -1,0 +1,53 @@
+{% set cliSessions = sessions is defined ? sessions : collector.cliSessions %}
+
+{% if cliSessions is empty %}
+    <div class="empty">
+        <p>No CLI sessions were recorded.</p>
+    </div>
+{% else %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Started at</th>
+                <th scope="col">Command</th>
+                <th scope="col">Requests</th>
+                <th scope="col">Total duration</th>
+                <th scope="col">Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for session in cliSessions %}
+                {% set requestCount = session.entries|length %}
+                {% set totalDuration = 0 %}
+                {% for entry in session.entries %}
+                    {% if entry.duration_ms is not null %}
+                        {% set totalDuration = totalDuration + entry.duration_ms %}
+                    {% endif %}
+                {% endfor %}
+
+                <tr>
+                    <td>{{ session.started_at is not empty ? session.started_at|date('Y-m-d H:i:s') : 'Unknown' }}</td>
+                    <td class="break-long-words">{{ session.command is not empty ? session.command : 'N/A' }}</td>
+                    <td>{{ requestCount }}</td>
+                    <td>
+                        {% if totalDuration > 0 %}
+                            {{ totalDuration|number_format(2, '.', ' ') }} ms
+                        {% else %}
+                            –
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a
+                            href="#"
+                            class="cli-session-link"
+                            data-session-id="{{ session.session_id }}"
+                            data-session-loader="json"
+                        >
+                            View details
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

@@ -1,9 +1,9 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
-    {% set requestCount = collector.data|length %}
+    {% set requestCount = collector.requests|length %}
     {% set totalDuration = 0 %}
-    {% for entry in collector.data %}
+    {% for entry in collector.requests %}
         {% if entry.durationMs is not null %}
             {% set totalDuration = totalDuration + entry.durationMs %}
         {% endif %}
@@ -37,9 +37,9 @@
 {% block panel %}
     <h2>HTTP Requests</h2>
 
-    {% set totalRequests = collector.data|length %}
+    {% set totalRequests = collector.requests|length %}
     {% set totalDuration = 0 %}
-    {% for entry in collector.data %}
+    {% for entry in collector.requests %}
         {% if entry.durationMs is not null %}
             {% set totalDuration = totalDuration + entry.durationMs %}
         {% endif %}
@@ -72,7 +72,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for entry in collector.data %}
+                {% for entry in collector.requests %}
                     <tr>
                         <td>{{ entry.method }}</td>
                         <td class="break-long-words">{{ entry.url }}</td>
@@ -84,4 +84,8 @@
             </tbody>
         </table>
     {% endif %}
+
+    <h2>CLI Sessions</h2>
+
+    {{ include('@UniversalHttpClientProfiler/Collector/cli_sessions.html.twig', { sessions: collector.cliSessions }) }}
 {% endblock %}
