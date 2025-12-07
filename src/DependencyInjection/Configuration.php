@@ -12,7 +12,17 @@ class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        // TODO: define bundle configuration options.
-        return new TreeBuilder('universal_http_client_profiler');
+        $treeBuilder = new TreeBuilder('universal_http_client_profiler');
+        $rootNode = $treeBuilder->getRootNode();
+
+        $rootNode
+            ->children()
+                ->integerNode('max_body_length')
+                    ->defaultValue(10240)
+                    ->min(0)
+                ->end()
+            ->end();
+
+        return $treeBuilder;
     }
 }

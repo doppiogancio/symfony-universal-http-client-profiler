@@ -15,7 +15,8 @@ class HttpClientTracer implements HttpClientInterface
 {
     public function __construct(
         private readonly HttpClientInterface $inner,
-        private readonly TraceStorage $storage
+        private readonly TraceStorage $storage,
+        private readonly int $maxBodyLength
     ) {
     }
 
@@ -24,8 +25,8 @@ class HttpClientTracer implements HttpClientInterface
         $timestamp = new DateTimeImmutable();
         $start = microtime(true);
 
-        $requestHeaders = $this->normalizeHeaders($options['headers'] ?? []);
-        $requestBody = $this->normalizeBody($options);
+        $requestHeaders = $this->maskSensitiveHeaders($this->normalizeHeaders($options['headers'] ?? []));
+        $requestBody = $this->truncateBody($this->normalizeBody($options));
         $responseStatus = null;
         $responseHeaders = [];
         $responseBody = null;
@@ -36,8 +37,8 @@ class HttpClientTracer implements HttpClientInterface
             $response = $this->inner->request($method, $url, $options);
 
             $responseStatus = $response->getStatusCode();
-            $responseHeaders = $response->getHeaders(false);
-            $responseBody = $response->getContent(false);
+            $responseHeaders = $this->maskSensitiveHeaders($response->getHeaders(false));
+            $responseBody = $this->truncateBody($response->getContent(false));
         } catch (\Throwable $exception) {
             $error = $exception->getMessage();
             $stackTrace = $this->captureExceptionTrace($exception);
@@ -83,6 +84,26 @@ class HttpClientTracer implements HttpClientInterface
         return $normalized;
     }
 
+    /**
+     * @param array<string, array<int, string>> $headers
+     * @return array<string, array<int, string>>
+     */
+    private function maskSensitiveHeaders(array $headers): array
+    {
+        $sensitiveHeaders = ['authorization', 'cookie', 'token'];
+
+        $masked = [];
+
+        foreach ($headers as $name => $values) {
+            $lowerName = strtolower($name);
+            $masked[$name] = in_array($lowerName, $sensitiveHeaders, true)
+                ? array_fill(0, count($values), '***')
+                : $values;
+        }
+
+        return $masked;
+    }
+
     private function normalizeBody(array $options): ?string
     {
         if (array_key_exists('body', $options)) {
@@ -115,6 +136,19 @@ class HttpClientTracer implements HttpClientInterface
         }
 
         return null;
+    }
+
+    private function truncateBody(?string $body): ?string
+    {
+        if ($body === null) {
+            return null;
+        }
+
+        if ($this->maxBodyLength <= 0 || strlen($body) <= $this->maxBodyLength) {
+            return $body;
+        }
+
+        return substr($body, 0, $this->maxBodyLength);
     }
 
     /**
