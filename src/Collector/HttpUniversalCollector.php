@@ -1,9 +1,9 @@
 <?php
 
-namespace UniversalHttpClientProfilerBundle\Collector;
+namespace Universal\HttpClientProfiler\Collector;
 
-use HttpProfiler\Session\SessionReader;
-use HttpProfiler\Storage\TraceStorage;
+use Universal\HttpClientProfiler\Session\SessionReader;
+use Universal\HttpClientProfiler\Storage\TraceStorage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -41,7 +41,7 @@ class HttpUniversalCollector extends DataCollector
     }
 
     /**
-     * @return array<int, \HttpProfiler\Model\TraceEntry>
+     * @return array<int, \Universal\HttpClientProfiler\Model\TraceEntry>
      */
     public function getRequests(): array
     {

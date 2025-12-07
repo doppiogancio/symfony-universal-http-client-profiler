@@ -1,13 +1,14 @@
 <?php
 
-use HttpProfiler\Session\ContextDetector;
-use HttpProfiler\Session\ConsoleSubscriber;
-use HttpProfiler\Session\SessionManager;
-use HttpProfiler\Session\SessionReader;
-use HttpProfiler\Storage\TraceStorage;
-use HttpProfiler\Tracer\HttpClientTracer;
+use Symfony\Component\Console\ConsoleEvents;
+use Universal\HttpClientProfiler\Session\ContextDetector;
+use Universal\HttpClientProfiler\Session\ConsoleSubscriber;
+use Universal\HttpClientProfiler\Session\SessionManager;
+use Universal\HttpClientProfiler\Session\SessionReader;
+use Universal\HttpClientProfiler\Storage\TraceStorage;
+use Universal\HttpClientProfiler\Tracer\HttpClientTracer;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use UniversalHttpClientProfilerBundle\Collector\HttpUniversalCollector;
+use Universal\HttpClientProfiler\Collector\HttpUniversalCollector;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
@@ -33,14 +34,16 @@ return static function (ContainerConfigurator $container): void {
 
     $services->set(SessionReader::class);
 
-    $services->set(ConsoleSubscriber::class)
-        ->tag('kernel.event_subscriber');
+    if (class_exists(ConsoleEvents::class)) {
+        $services->set(ConsoleSubscriber::class)
+            ->tag('kernel.event_subscriber');
+    }
 
     $services->set(ContextDetector::class);
 
     $services->set(HttpUniversalCollector::class)
         ->tag('data_collector', [
             'id' => 'http_universal_profiler',
-            'template' => '@UniversalHttpClientProfiler/Collector/http_profiler.html.twig',
+            'template' => '@UniversalHttpClientProfiler/collector.html.twig',
         ]);
 };

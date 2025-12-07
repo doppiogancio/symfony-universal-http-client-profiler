@@ -1,6 +1,6 @@
 <?php
 
-namespace HttpProfiler\Model;
+namespace Universal\HttpClientProfiler\Model;
 
 use DateTimeImmutable;
 

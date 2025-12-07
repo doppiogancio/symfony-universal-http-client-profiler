@@ -1,6 +1,6 @@
 <?php
 
-namespace HttpProfiler\Session;
+namespace Universal\HttpClientProfiler\Session;
 
 use JsonException;
 use RuntimeException;

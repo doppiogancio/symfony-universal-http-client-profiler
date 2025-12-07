@@ -1,6 +1,6 @@
 <?php
 
-namespace HttpProfiler\Session;
+namespace Universal\HttpClientProfiler\Session;
 
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;

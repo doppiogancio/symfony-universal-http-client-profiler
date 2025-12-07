@@ -1,10 +1,10 @@
 <?php
 
-namespace HttpProfiler\Session;
+namespace Universal\HttpClientProfiler\Session;
 
 use DateTimeImmutable;
 use JsonException;
-use HttpProfiler\Model\TraceEntry;
+use Universal\HttpClientProfiler\Model\TraceEntry;
 use RuntimeException;
 
 /**
