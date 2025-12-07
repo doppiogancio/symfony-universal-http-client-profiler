@@ -1,11 +1,34 @@
 <?php
 
-namespace UniversalHttpClientProfilerBundle\Storage;
+namespace HttpProfiler\Storage;
+
+use HttpProfiler\Model\TraceEntry;
 
 /**
- * Handles persistence of HTTP trace entries.
+ * Handles in-memory storage of HTTP trace entries.
  */
 class TraceStorage
 {
-    // TODO: implement storage logic for trace entries.
+    /**
+     * @var array<int, TraceEntry>
+     */
+    private array $entries = [];
+
+    public function add(TraceEntry $entry): void
+    {
+        $this->entries[] = $entry;
+    }
+
+    /**
+     * @return array<int, TraceEntry>
+     */
+    public function all(): array
+    {
+        return $this->entries;
+    }
+
+    public function clear(): void
+    {
+        $this->entries = [];
+    }
 }
