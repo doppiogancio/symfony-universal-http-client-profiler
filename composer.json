@@ -1,0 +1,15 @@
+{
+    "name": "universal/http-client-profiler-bundle",
+    "description": "Symfony bundle for profiling universal HTTP client requests.",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "UniversalHttpClientProfilerBundle\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=8.1",
+        "symfony/http-kernel": "^6.0 || ^7.0"
+    }
+}
