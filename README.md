@@ -5,7 +5,7 @@ A ready-to-use Symfony bundle that profiles outgoing HTTP requests and exposes t
 ## Installation
 
 ```bash
-composer require universal/http-client-profiler-bundle
+composer require doppiogancio/http-client-profiler-bundle
 ```
 
 ## Usage
