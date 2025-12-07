@@ -90,7 +90,15 @@ class HttpClientTracer implements HttpClientInterface
      */
     private function maskSensitiveHeaders(array $headers): array
     {
-        $sensitiveHeaders = ['authorization', 'cookie', 'token'];
+        $sensitiveHeaders = [
+            'authorization',
+            'cookie',
+            'proxy-authorization',
+            'proxy-authenticate',
+            'set-cookie',
+            'token',
+            'www-authenticate',
+        ];
 
         $masked = [];
 
