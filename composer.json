@@ -3,6 +3,8 @@
     "description": "Symfony bundle for profiling universal HTTP client requests.",
     "type": "symfony-bundle",
     "license": "MIT",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Universal\\HttpClientProfiler\\": "src/"
