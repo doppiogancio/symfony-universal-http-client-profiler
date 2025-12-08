@@ -1,0 +1,13 @@
+{% extends '@WebProfiler/Profiler/home.html.twig' %}
+
+{% block body %}
+    {{ parent() }}
+
+    <div class="block">
+        <h2 class="break-long-words">CLI Commands</h2>
+        <p>Accedi velocemente alla lista delle esecuzioni CLI e alle relative richieste HTTP.</p>
+        <div class="actions">
+            <a class="btn" href="{{ path('universal_http_client_profiler.cli_sessions') }}">Apri elenco comandi</a>
+        </div>
+    </div>
+{% endblock %}
