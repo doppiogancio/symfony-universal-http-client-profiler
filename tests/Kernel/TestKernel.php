@@ -3,8 +3,8 @@
 namespace Universal\HttpClientProfiler\Tests\Kernel;
 
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 use Universal\HttpClientProfiler\UniversalHttpClientProfilerBundle;
 
@@ -14,22 +14,15 @@ class TestKernel extends Kernel
     {
         return [
             new FrameworkBundle(),
+            new WebProfilerBundle(),
+            new \Symfony\Bundle\TwigBundle\TwigBundle(),
             new UniversalHttpClientProfilerBundle(),
         ];
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
-        $loader->load(function (ContainerBuilder $container): void {
-            $container->loadFromExtension('framework', [
-                'secret' => 'test',
-                'test' => true,
-                'http_method_override' => false,
-                'router' => [
-                    'utf8' => true,
-                ],
-            ]);
-        });
+        $loader->load($this->getProjectDir() . '/tests/Kernel/config.yaml');
     }
 
     public function getProjectDir(): string

@@ -3,6 +3,7 @@
 namespace Universal\HttpClientProfiler\Tracer;
 
 use DateTimeImmutable;
+use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 use Universal\HttpClientProfiler\Model\TraceEntry;
 use Universal\HttpClientProfiler\Storage\TraceStorage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -16,8 +17,14 @@ class HttpClientTracer implements HttpClientInterface
     public function __construct(
         private readonly HttpClientInterface $inner,
         private readonly TraceStorage $storage,
+        private readonly \Universal\HttpClientProfiler\Session\SessionManager $sessionManager,
         private readonly int $maxBodyLength
     ) {
+    }
+
+    public function withOptions(array $options): static
+    {
+        // TODO: Implement withOptions() method.
     }
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
@@ -46,7 +53,7 @@ class HttpClientTracer implements HttpClientInterface
         } finally {
             $durationMs = (microtime(true) - $start) * 1000;
 
-            $this->storage->add(new TraceEntry(
+            $entry = new TraceEntry(
                 $timestamp,
                 $method,
                 $url,
@@ -58,22 +65,25 @@ class HttpClientTracer implements HttpClientInterface
                 $durationMs,
                 $error,
                 $stackTrace
-            ));
+            );
+
+            $this->storage->add($entry);
+            $this->sessionManager->addTrace($entry);
         }
 
         return $response;
     }
 
-    public function stream(ResponseInterface|iterable $responses, float $timeout = null): iterable
+    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
     {
         return $this->inner->stream($responses, $timeout);
     }
 
     /**
-     * @param array<string, mixed>|iterable<string> $headers
+     * @param iterable<string> $headers
      * @return array<string, array<int, string>>
      */
-    private function normalizeHeaders(array|iterable $headers): array
+    private function normalizeHeaders(iterable $headers): array
     {
         $normalized = [];
 
@@ -165,7 +175,7 @@ class HttpClientTracer implements HttpClientInterface
     private function captureStackTrace(): array
     {
         return array_map(
-            static fn (array $trace): string => sprintf(
+            static fn(array $trace): string => sprintf(
                 '%s:%s%s',
                 $trace['file'] ?? '[internal]',
                 $trace['line'] ?? '0',
