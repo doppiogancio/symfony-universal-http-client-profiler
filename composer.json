@@ -8,6 +8,11 @@
             "Universal\\HttpClientProfiler\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Universal\\HttpClientProfiler\\Tests\\": "tests/"
+        }
+    },
     "require": {
         "php": ">=8.1",
         "symfony/config": "^6.0 || ^7.0",
