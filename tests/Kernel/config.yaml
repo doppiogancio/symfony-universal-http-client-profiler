@@ -1,0 +1,15 @@
+framework:
+    secret: "test"
+    test: true
+    profiler:
+        enabled: true
+        collect: true
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    test.http_client:
+        class: Symfony\Component\HttpClient\Psr18Client
+        public: true
