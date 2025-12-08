@@ -1,0 +1,12 @@
+{% extends '@WebProfiler/Profiler/base.html.twig' %}
+
+{% block body %}
+    <div class="page-title">
+        <h1>CLI Sessions</h1>
+        <p class="help">Elenco delle esecuzioni CLI che hanno generato richieste HTTP.</p>
+    </div>
+
+    <div class="section">
+        {{ include('@UniversalHttpClientProfiler/Collector/cli_sessions.html.twig', { sessions: sessions }) }}
+    </div>
+{% endblock %}

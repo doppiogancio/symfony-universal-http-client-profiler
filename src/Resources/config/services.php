@@ -7,6 +7,7 @@ use Universal\HttpClientProfiler\Session\SessionManager;
 use Universal\HttpClientProfiler\Session\SessionReader;
 use Universal\HttpClientProfiler\Storage\TraceStorage;
 use Universal\HttpClientProfiler\Tracer\HttpClientTracer;
+use Universal\HttpClientProfiler\Controller\CliSessionsController;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Universal\HttpClientProfiler\Collector\HttpUniversalCollector;
 
@@ -48,4 +49,7 @@ return static function (ContainerConfigurator $container): void {
             'id' => 'http_universal_profiler',
             'template' => '@UniversalHttpClientProfiler/Collector/http_profiler.html.twig',
         ]);
+
+    $services->set(CliSessionsController::class)
+        ->tag('controller.service_arguments');
 };
