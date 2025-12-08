@@ -28,6 +28,7 @@ return static function (ContainerConfigurator $container): void {
         ->args([
             service('.inner'),
             service(TraceStorage::class),
+            service(SessionManager::class),
             param('universal_http_client_profiler.max_body_length'),
         ]);
 

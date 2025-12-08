@@ -17,6 +17,7 @@ class HttpClientTracer implements HttpClientInterface
     public function __construct(
         private readonly HttpClientInterface $inner,
         private readonly TraceStorage $storage,
+        private readonly \Universal\HttpClientProfiler\Session\SessionManager $sessionManager,
         private readonly int $maxBodyLength
     ) {
     }
@@ -52,7 +53,7 @@ class HttpClientTracer implements HttpClientInterface
         } finally {
             $durationMs = (microtime(true) - $start) * 1000;
 
-            $this->storage->add(new TraceEntry(
+            $entry = new TraceEntry(
                 $timestamp,
                 $method,
                 $url,
@@ -64,7 +65,10 @@ class HttpClientTracer implements HttpClientInterface
                 $durationMs,
                 $error,
                 $stackTrace
-            ));
+            );
+
+            $this->storage->add($entry);
+            $this->sessionManager->addTrace($entry);
         }
 
         return $response;
@@ -171,7 +175,7 @@ class HttpClientTracer implements HttpClientInterface
     private function captureStackTrace(): array
     {
         return array_map(
-            static fn (array $trace): string => sprintf(
+            static fn(array $trace): string => sprintf(
                 '%s:%s%s',
                 $trace['file'] ?? '[internal]',
                 $trace['line'] ?? '0',
