@@ -24,7 +24,9 @@
     "require-dev": {
         "phpunit/phpunit": "^10.5",
         "symfony/phpunit-bridge": "^7.0",
-        "symfony/framework-bundle": "^6.0 || ^7.0"
+        "symfony/framework-bundle": "^6.0 || ^7.0",
+        "symfony/http-client": "^6.0 || ^7.0",
+        "symfony/web-profiler-bundle": "^6.0 || ^7.0"
     },
     "scripts": {
         "test": "phpunit"
