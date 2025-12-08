@@ -23,7 +23,7 @@ class TestKernelBootTest extends TestCase
         $bundles = $kernel->getBundles();
         $this->assertArrayHasKey('UniversalHttpClientProfilerBundle', $bundles);
 
-        $httpClient = $container->get('http_client');
+        $httpClient = $container->get('public_http_client');
         $this->assertInstanceOf(HttpClientTracer::class, $httpClient);
 
         $kernel->shutdown();

@@ -20,6 +20,7 @@ return static function (ContainerConfigurator $container): void {
         ->autoconfigure();
 
     $services->set(TraceStorage::class)
+        ->public()
         ->share(true);
 
     $services->set(HttpClientTracer::class)

@@ -15,6 +15,7 @@ class TestKernel extends Kernel
         return [
             new FrameworkBundle(),
             new WebProfilerBundle(),
+            new \Symfony\Bundle\TwigBundle\TwigBundle(),
             new UniversalHttpClientProfilerBundle(),
         ];
     }

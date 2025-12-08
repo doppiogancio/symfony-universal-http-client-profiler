@@ -3,6 +3,7 @@
 namespace Universal\HttpClientProfiler\Tracer;
 
 use DateTimeImmutable;
+use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 use Universal\HttpClientProfiler\Model\TraceEntry;
 use Universal\HttpClientProfiler\Storage\TraceStorage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -18,6 +19,11 @@ class HttpClientTracer implements HttpClientInterface
         private readonly TraceStorage $storage,
         private readonly int $maxBodyLength
     ) {
+    }
+
+    public function withOptions(array $options): static
+    {
+        // TODO: Implement withOptions() method.
     }
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
@@ -64,16 +70,16 @@ class HttpClientTracer implements HttpClientInterface
         return $response;
     }
 
-    public function stream(ResponseInterface|iterable $responses, float $timeout = null): iterable
+    public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
     {
         return $this->inner->stream($responses, $timeout);
     }
 
     /**
-     * @param array<string, mixed>|iterable<string> $headers
+     * @param iterable<string> $headers
      * @return array<string, array<int, string>>
      */
-    private function normalizeHeaders(array|iterable $headers): array
+    private function normalizeHeaders(iterable $headers): array
     {
         $normalized = [];
 

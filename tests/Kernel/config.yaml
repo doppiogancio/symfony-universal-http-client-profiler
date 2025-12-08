@@ -6,6 +6,13 @@ framework:
         enabled: true
         collect: true
 
+    router:
+        utf8: true
+        resource: "%kernel.project_dir%/tests/Kernel/config.yaml"
+
+twig:
+    strict_variables: true
+
 services:
     _defaults:
         autowire: true
@@ -13,4 +20,8 @@ services:
 
     test.http_client:
         class: Symfony\Component\HttpClient\Psr18Client
+        public: true
+
+    public_http_client:
+        alias: http_client
         public: true
