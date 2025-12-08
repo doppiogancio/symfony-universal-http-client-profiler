@@ -1,6 +1,7 @@
 framework:
     secret: "test"
     test: true
+    http_client: ~
     profiler:
         enabled: true
         collect: true
