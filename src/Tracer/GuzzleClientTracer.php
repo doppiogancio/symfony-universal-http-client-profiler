@@ -96,7 +96,7 @@ class GuzzleClientTracer implements ClientInterface
                     stackTrace: $stackTrace,
                 );
 
-                return $response;
+                return Create::promiseFor($response);
             },
             function ($reason) use ($timestamp, $request, $requestHeaders, $requestBody, $start, $stackTrace) {
                 $error = $reason instanceof \Throwable ? $reason->getMessage() : (string) $reason;
